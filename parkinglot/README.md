@@ -66,3 +66,8 @@
 |                                         |     → Creates Bill
 |                                         |     → Processes Payment
 +-----------------------------+            +------------------------------+
+
+
+
+
+![Parking System Class Diagram](parking_system_class_diagram.png)
