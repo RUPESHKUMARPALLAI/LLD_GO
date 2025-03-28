@@ -65,3 +65,13 @@ func (l *LeakyBucketLimiter) StartLeaking() {
 func (l *LeakyBucketLimiter) StopLeaking() {
 	l.cancelFunc()
 }
+
+func (l *LeakyBucketLimiter) AllowRequestCheck() bool {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
+	if len(l.queue) < l.capacity {
+		return true
+	}
+	return false
+}
