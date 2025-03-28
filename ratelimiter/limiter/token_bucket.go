@@ -9,12 +9,12 @@ import (
 type TokenBucketLimiter struct {
 	capacity     int
 	tokens       int
-	refillRate   int //per second refill rate
+	refillRate   time.Duration 
 	lastRefilled time.Time
 	mutex        sync.Mutex
 }
 
-func NewTokenBucketLimiter(capacity int, refillRate int) *TokenBucketLimiter {
+func NewTokenBucketLimiter(capacity int, refillRate time.Duration) *TokenBucketLimiter {
 	return &TokenBucketLimiter{
 		capacity:     capacity,
 		tokens:       capacity,
@@ -28,9 +28,9 @@ func (t *TokenBucketLimiter) AllowRequestCheck() bool {
 	defer t.mutex.Unlock()
 	now := time.Now()
 	timeElapsedSinceLastCheck := now.Sub(t.lastRefilled).Seconds()
-	tokenstoAdd := int(timeElapsedSinceLastCheck) * t.refillRate
+	tokenstoAdd := int(timeElapsedSinceLastCheck/t.refillRate.Seconds())
 	t.tokens = int(math.Min(float64(t.capacity), float64(t.tokens+tokenstoAdd)))
-	t.lastRefilled = t.lastRefilled.Add(time.Duration(int(timeElapsedSinceLastCheck)) * time.Second) ///this line is required to prevent time leakage
+	t.lastRefilled = now
 
 	if t.tokens > 0 {
 		t.tokens--
